@@ -102,7 +102,7 @@ export default function ResultsPanel() {
           <div className="grid gap-4 md:grid-cols-2">
             <Figure title="Ground truth (real)" note="test · graph_out"
               src={`/api/sample?split=test&id=${id}&kind=rooms&size=512`} />
-            <Figure title="Generated (U-Net)" note={`${run.dir} · predicted`}
+            <Figure title={`Generated · ${run.label}`} note={`${run.dir} · predicted`}
               src={`/api/sample?split=test&id=${id}&kind=pred&pred=${run.dir}&size=512`} />
           </div>
         )}
