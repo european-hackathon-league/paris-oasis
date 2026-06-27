@@ -4,10 +4,11 @@ services:
       context: ./web
       dockerfile: Dockerfile
     image: msd-floorplan-web
-    container_name: msd-floorplan-web
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    # Coolify's reverse proxy (Traefik) routes the domain to this container on the
+    # internal network — do NOT publish a host port (causes "port already allocated").
+    expose:
+      - "3000"
     environment:
       - NODE_ENV=production
       - NEXT_TELEMETRY_DISABLED=1
