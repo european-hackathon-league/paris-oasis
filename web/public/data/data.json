@@ -1,0 +1,1669 @@
+{
+  "stats": {
+    "apartments": 18902,
+    "floors": 5372,
+    "geometries": 1086846,
+    "trainSamples": 4572,
+    "testSamples": 800,
+    "statsOver": 600,
+    "avgRooms": 36.3,
+    "medianRooms": 27
+  },
+  "roomTypes": [
+    {
+      "id": 0,
+      "name": "Bedroom",
+      "color": "#1f77b4",
+      "count": 5924
+    },
+    {
+      "id": 1,
+      "name": "Livingroom",
+      "color": "#e6550d",
+      "count": 1255
+    },
+    {
+      "id": 2,
+      "name": "Kitchen",
+      "color": "#fd8d3c",
+      "count": 2397
+    },
+    {
+      "id": 3,
+      "name": "Dining",
+      "color": "#fdae6b",
+      "count": 37
+    },
+    {
+      "id": 4,
+      "name": "Corridor",
+      "color": "#fdd0a2",
+      "count": 3623
+    },
+    {
+      "id": 5,
+      "name": "Stairs",
+      "color": "#72246c",
+      "count": 973
+    },
+    {
+      "id": 6,
+      "name": "Storeroom",
+      "color": "#5254a3",
+      "count": 1209
+    },
+    {
+      "id": 7,
+      "name": "Bathroom",
+      "color": "#6b6ecf",
+      "count": 3783
+    },
+    {
+      "id": 8,
+      "name": "Balcony",
+      "color": "#2ca02c",
+      "count": 2551
+    },
+    {
+      "id": 9,
+      "name": "Structure",
+      "color": "#000000",
+      "count": 0
+    },
+    {
+      "id": 10,
+      "name": "Door",
+      "color": "#ffc000",
+      "count": 0
+    },
+    {
+      "id": 11,
+      "name": "Entrance Door",
+      "color": "#98df8a",
+      "count": 0
+    },
+    {
+      "id": 12,
+      "name": "Window",
+      "color": "#d62728",
+      "count": 0
+    }
+  ],
+  "roomsHistogram": [
+    {
+      "rooms": 15,
+      "count": 16
+    },
+    {
+      "rooms": 16,
+      "count": 24
+    },
+    {
+      "rooms": 17,
+      "count": 14
+    },
+    {
+      "rooms": 18,
+      "count": 32
+    },
+    {
+      "rooms": 19,
+      "count": 26
+    },
+    {
+      "rooms": 20,
+      "count": 24
+    },
+    {
+      "rooms": 21,
+      "count": 29
+    },
+    {
+      "rooms": 22,
+      "count": 26
+    },
+    {
+      "rooms": 23,
+      "count": 16
+    },
+    {
+      "rooms": 24,
+      "count": 22
+    },
+    {
+      "rooms": 25,
+      "count": 22
+    },
+    {
+      "rooms": 26,
+      "count": 24
+    },
+    {
+      "rooms": 27,
+      "count": 26
+    },
+    {
+      "rooms": 28,
+      "count": 21
+    },
+    {
+      "rooms": 29,
+      "count": 8
+    },
+    {
+      "rooms": 30,
+      "count": 8
+    },
+    {
+      "rooms": 31,
+      "count": 17
+    },
+    {
+      "rooms": 32,
+      "count": 13
+    },
+    {
+      "rooms": 33,
+      "count": 3
+    },
+    {
+      "rooms": 34,
+      "count": 12
+    },
+    {
+      "rooms": 35,
+      "count": 9
+    },
+    {
+      "rooms": 36,
+      "count": 18
+    },
+    {
+      "rooms": 37,
+      "count": 6
+    },
+    {
+      "rooms": 38,
+      "count": 12
+    },
+    {
+      "rooms": 39,
+      "count": 6
+    },
+    {
+      "rooms": 40,
+      "count": 13
+    },
+    {
+      "rooms": 41,
+      "count": 7
+    },
+    {
+      "rooms": 42,
+      "count": 13
+    },
+    {
+      "rooms": 43,
+      "count": 4
+    },
+    {
+      "rooms": 44,
+      "count": 17
+    },
+    {
+      "rooms": 45,
+      "count": 2
+    },
+    {
+      "rooms": 46,
+      "count": 4
+    },
+    {
+      "rooms": 47,
+      "count": 1
+    },
+    {
+      "rooms": 48,
+      "count": 4
+    },
+    {
+      "rooms": 49,
+      "count": 4
+    },
+    {
+      "rooms": 50,
+      "count": 3
+    },
+    {
+      "rooms": 51,
+      "count": 2
+    },
+    {
+      "rooms": 52,
+      "count": 4
+    },
+    {
+      "rooms": 53,
+      "count": 0
+    },
+    {
+      "rooms": 54,
+      "count": 5
+    },
+    {
+      "rooms": 55,
+      "count": 3
+    },
+    {
+      "rooms": 56,
+      "count": 6
+    },
+    {
+      "rooms": 57,
+      "count": 5
+    },
+    {
+      "rooms": 58,
+      "count": 4
+    },
+    {
+      "rooms": 59,
+      "count": 1
+    },
+    {
+      "rooms": 60,
+      "count": 3
+    },
+    {
+      "rooms": 61,
+      "count": 2
+    },
+    {
+      "rooms": 62,
+      "count": 2
+    },
+    {
+      "rooms": 63,
+      "count": 1
+    },
+    {
+      "rooms": 64,
+      "count": 4
+    },
+    {
+      "rooms": 65,
+      "count": 2
+    },
+    {
+      "rooms": 66,
+      "count": 1
+    },
+    {
+      "rooms": 67,
+      "count": 0
+    },
+    {
+      "rooms": 68,
+      "count": 1
+    },
+    {
+      "rooms": 69,
+      "count": 1
+    },
+    {
+      "rooms": 70,
+      "count": 1
+    },
+    {
+      "rooms": 71,
+      "count": 0
+    },
+    {
+      "rooms": 72,
+      "count": 2
+    },
+    {
+      "rooms": 73,
+      "count": 0
+    },
+    {
+      "rooms": 74,
+      "count": 1
+    },
+    {
+      "rooms": 75,
+      "count": 0
+    },
+    {
+      "rooms": 76,
+      "count": 3
+    },
+    {
+      "rooms": 77,
+      "count": 2
+    },
+    {
+      "rooms": 78,
+      "count": 1
+    },
+    {
+      "rooms": 79,
+      "count": 2
+    },
+    {
+      "rooms": 80,
+      "count": 0
+    },
+    {
+      "rooms": 81,
+      "count": 4
+    },
+    {
+      "rooms": 82,
+      "count": 0
+    },
+    {
+      "rooms": 83,
+      "count": 0
+    },
+    {
+      "rooms": 84,
+      "count": 1
+    },
+    {
+      "rooms": 85,
+      "count": 1
+    },
+    {
+      "rooms": 86,
+      "count": 0
+    },
+    {
+      "rooms": 87,
+      "count": 1
+    },
+    {
+      "rooms": 88,
+      "count": 1
+    },
+    {
+      "rooms": 89,
+      "count": 2
+    },
+    {
+      "rooms": 90,
+      "count": 1
+    },
+    {
+      "rooms": 91,
+      "count": 1
+    },
+    {
+      "rooms": 92,
+      "count": 1
+    },
+    {
+      "rooms": 93,
+      "count": 0
+    },
+    {
+      "rooms": 94,
+      "count": 0
+    },
+    {
+      "rooms": 95,
+      "count": 0
+    },
+    {
+      "rooms": 96,
+      "count": 0
+    },
+    {
+      "rooms": 97,
+      "count": 1
+    },
+    {
+      "rooms": 98,
+      "count": 0
+    },
+    {
+      "rooms": 99,
+      "count": 1
+    },
+    {
+      "rooms": 100,
+      "count": 0
+    },
+    {
+      "rooms": 101,
+      "count": 0
+    },
+    {
+      "rooms": 102,
+      "count": 0
+    },
+    {
+      "rooms": 103,
+      "count": 0
+    },
+    {
+      "rooms": 104,
+      "count": 0
+    },
+    {
+      "rooms": 105,
+      "count": 0
+    },
+    {
+      "rooms": 106,
+      "count": 0
+    },
+    {
+      "rooms": 107,
+      "count": 1
+    },
+    {
+      "rooms": 108,
+      "count": 0
+    },
+    {
+      "rooms": 109,
+      "count": 0
+    },
+    {
+      "rooms": 110,
+      "count": 1
+    },
+    {
+      "rooms": 111,
+      "count": 0
+    },
+    {
+      "rooms": 112,
+      "count": 0
+    },
+    {
+      "rooms": 113,
+      "count": 0
+    },
+    {
+      "rooms": 114,
+      "count": 0
+    },
+    {
+      "rooms": 115,
+      "count": 2
+    },
+    {
+      "rooms": 116,
+      "count": 3
+    },
+    {
+      "rooms": 117,
+      "count": 1
+    },
+    {
+      "rooms": 118,
+      "count": 0
+    },
+    {
+      "rooms": 119,
+      "count": 0
+    },
+    {
+      "rooms": 120,
+      "count": 0
+    },
+    {
+      "rooms": 121,
+      "count": 0
+    },
+    {
+      "rooms": 122,
+      "count": 0
+    },
+    {
+      "rooms": 123,
+      "count": 2
+    },
+    {
+      "rooms": 124,
+      "count": 1
+    },
+    {
+      "rooms": 125,
+      "count": 1
+    },
+    {
+      "rooms": 126,
+      "count": 0
+    },
+    {
+      "rooms": 127,
+      "count": 0
+    },
+    {
+      "rooms": 128,
+      "count": 0
+    },
+    {
+      "rooms": 129,
+      "count": 0
+    },
+    {
+      "rooms": 130,
+      "count": 0
+    },
+    {
+      "rooms": 131,
+      "count": 0
+    },
+    {
+      "rooms": 132,
+      "count": 1
+    },
+    {
+      "rooms": 133,
+      "count": 1
+    },
+    {
+      "rooms": 134,
+      "count": 0
+    },
+    {
+      "rooms": 135,
+      "count": 0
+    },
+    {
+      "rooms": 136,
+      "count": 0
+    },
+    {
+      "rooms": 137,
+      "count": 0
+    },
+    {
+      "rooms": 138,
+      "count": 0
+    },
+    {
+      "rooms": 139,
+      "count": 0
+    },
+    {
+      "rooms": 140,
+      "count": 0
+    },
+    {
+      "rooms": 141,
+      "count": 0
+    },
+    {
+      "rooms": 142,
+      "count": 0
+    },
+    {
+      "rooms": 143,
+      "count": 0
+    },
+    {
+      "rooms": 144,
+      "count": 0
+    },
+    {
+      "rooms": 145,
+      "count": 0
+    },
+    {
+      "rooms": 146,
+      "count": 0
+    },
+    {
+      "rooms": 147,
+      "count": 0
+    },
+    {
+      "rooms": 148,
+      "count": 0
+    },
+    {
+      "rooms": 149,
+      "count": 0
+    },
+    {
+      "rooms": 150,
+      "count": 0
+    },
+    {
+      "rooms": 151,
+      "count": 0
+    },
+    {
+      "rooms": 152,
+      "count": 0
+    },
+    {
+      "rooms": 153,
+      "count": 0
+    },
+    {
+      "rooms": 154,
+      "count": 0
+    },
+    {
+      "rooms": 155,
+      "count": 0
+    },
+    {
+      "rooms": 156,
+      "count": 0
+    },
+    {
+      "rooms": 157,
+      "count": 0
+    },
+    {
+      "rooms": 158,
+      "count": 0
+    },
+    {
+      "rooms": 159,
+      "count": 0
+    },
+    {
+      "rooms": 160,
+      "count": 0
+    },
+    {
+      "rooms": 161,
+      "count": 0
+    },
+    {
+      "rooms": 162,
+      "count": 0
+    },
+    {
+      "rooms": 163,
+      "count": 1
+    },
+    {
+      "rooms": 164,
+      "count": 0
+    },
+    {
+      "rooms": 165,
+      "count": 0
+    },
+    {
+      "rooms": 166,
+      "count": 0
+    },
+    {
+      "rooms": 167,
+      "count": 0
+    },
+    {
+      "rooms": 168,
+      "count": 0
+    },
+    {
+      "rooms": 169,
+      "count": 0
+    },
+    {
+      "rooms": 170,
+      "count": 0
+    },
+    {
+      "rooms": 171,
+      "count": 0
+    },
+    {
+      "rooms": 172,
+      "count": 0
+    },
+    {
+      "rooms": 173,
+      "count": 0
+    },
+    {
+      "rooms": 174,
+      "count": 0
+    },
+    {
+      "rooms": 175,
+      "count": 0
+    },
+    {
+      "rooms": 176,
+      "count": 0
+    },
+    {
+      "rooms": 177,
+      "count": 0
+    },
+    {
+      "rooms": 178,
+      "count": 1
+    },
+    {
+      "rooms": 179,
+      "count": 0
+    },
+    {
+      "rooms": 180,
+      "count": 0
+    },
+    {
+      "rooms": 181,
+      "count": 0
+    },
+    {
+      "rooms": 182,
+      "count": 0
+    },
+    {
+      "rooms": 183,
+      "count": 0
+    },
+    {
+      "rooms": 184,
+      "count": 0
+    },
+    {
+      "rooms": 185,
+      "count": 1
+    },
+    {
+      "rooms": 186,
+      "count": 0
+    },
+    {
+      "rooms": 187,
+      "count": 0
+    },
+    {
+      "rooms": 188,
+      "count": 0
+    },
+    {
+      "rooms": 189,
+      "count": 0
+    },
+    {
+      "rooms": 190,
+      "count": 0
+    },
+    {
+      "rooms": 191,
+      "count": 0
+    },
+    {
+      "rooms": 192,
+      "count": 1
+    },
+    {
+      "rooms": 193,
+      "count": 1
+    },
+    {
+      "rooms": 194,
+      "count": 0
+    },
+    {
+      "rooms": 195,
+      "count": 0
+    },
+    {
+      "rooms": 196,
+      "count": 0
+    },
+    {
+      "rooms": 197,
+      "count": 0
+    },
+    {
+      "rooms": 198,
+      "count": 0
+    },
+    {
+      "rooms": 199,
+      "count": 0
+    },
+    {
+      "rooms": 200,
+      "count": 0
+    },
+    {
+      "rooms": 201,
+      "count": 0
+    },
+    {
+      "rooms": 202,
+      "count": 0
+    },
+    {
+      "rooms": 203,
+      "count": 0
+    },
+    {
+      "rooms": 204,
+      "count": 0
+    },
+    {
+      "rooms": 205,
+      "count": 0
+    },
+    {
+      "rooms": 206,
+      "count": 0
+    },
+    {
+      "rooms": 207,
+      "count": 0
+    },
+    {
+      "rooms": 208,
+      "count": 0
+    },
+    {
+      "rooms": 209,
+      "count": 0
+    },
+    {
+      "rooms": 210,
+      "count": 0
+    },
+    {
+      "rooms": 211,
+      "count": 0
+    },
+    {
+      "rooms": 212,
+      "count": 0
+    },
+    {
+      "rooms": 213,
+      "count": 0
+    },
+    {
+      "rooms": 214,
+      "count": 0
+    },
+    {
+      "rooms": 215,
+      "count": 0
+    },
+    {
+      "rooms": 216,
+      "count": 0
+    },
+    {
+      "rooms": 217,
+      "count": 0
+    },
+    {
+      "rooms": 218,
+      "count": 0
+    },
+    {
+      "rooms": 219,
+      "count": 0
+    },
+    {
+      "rooms": 220,
+      "count": 0
+    },
+    {
+      "rooms": 221,
+      "count": 0
+    },
+    {
+      "rooms": 222,
+      "count": 0
+    },
+    {
+      "rooms": 223,
+      "count": 0
+    },
+    {
+      "rooms": 224,
+      "count": 0
+    },
+    {
+      "rooms": 225,
+      "count": 0
+    },
+    {
+      "rooms": 226,
+      "count": 0
+    },
+    {
+      "rooms": 227,
+      "count": 0
+    },
+    {
+      "rooms": 228,
+      "count": 0
+    },
+    {
+      "rooms": 229,
+      "count": 0
+    },
+    {
+      "rooms": 230,
+      "count": 0
+    },
+    {
+      "rooms": 231,
+      "count": 0
+    },
+    {
+      "rooms": 232,
+      "count": 0
+    },
+    {
+      "rooms": 233,
+      "count": 0
+    },
+    {
+      "rooms": 234,
+      "count": 0
+    },
+    {
+      "rooms": 235,
+      "count": 0
+    },
+    {
+      "rooms": 236,
+      "count": 0
+    },
+    {
+      "rooms": 237,
+      "count": 0
+    },
+    {
+      "rooms": 238,
+      "count": 0
+    },
+    {
+      "rooms": 239,
+      "count": 0
+    },
+    {
+      "rooms": 240,
+      "count": 0
+    },
+    {
+      "rooms": 241,
+      "count": 0
+    },
+    {
+      "rooms": 242,
+      "count": 0
+    },
+    {
+      "rooms": 243,
+      "count": 0
+    },
+    {
+      "rooms": 244,
+      "count": 0
+    },
+    {
+      "rooms": 245,
+      "count": 0
+    },
+    {
+      "rooms": 246,
+      "count": 0
+    },
+    {
+      "rooms": 247,
+      "count": 0
+    },
+    {
+      "rooms": 248,
+      "count": 0
+    },
+    {
+      "rooms": 249,
+      "count": 0
+    },
+    {
+      "rooms": 250,
+      "count": 0
+    },
+    {
+      "rooms": 251,
+      "count": 0
+    },
+    {
+      "rooms": 252,
+      "count": 0
+    },
+    {
+      "rooms": 253,
+      "count": 0
+    },
+    {
+      "rooms": 254,
+      "count": 0
+    },
+    {
+      "rooms": 255,
+      "count": 0
+    },
+    {
+      "rooms": 256,
+      "count": 0
+    },
+    {
+      "rooms": 257,
+      "count": 0
+    },
+    {
+      "rooms": 258,
+      "count": 0
+    },
+    {
+      "rooms": 259,
+      "count": 0
+    },
+    {
+      "rooms": 260,
+      "count": 0
+    },
+    {
+      "rooms": 261,
+      "count": 0
+    },
+    {
+      "rooms": 262,
+      "count": 0
+    },
+    {
+      "rooms": 263,
+      "count": 0
+    },
+    {
+      "rooms": 264,
+      "count": 0
+    },
+    {
+      "rooms": 265,
+      "count": 0
+    },
+    {
+      "rooms": 266,
+      "count": 0
+    },
+    {
+      "rooms": 267,
+      "count": 0
+    },
+    {
+      "rooms": 268,
+      "count": 0
+    },
+    {
+      "rooms": 269,
+      "count": 0
+    },
+    {
+      "rooms": 270,
+      "count": 0
+    },
+    {
+      "rooms": 271,
+      "count": 0
+    },
+    {
+      "rooms": 272,
+      "count": 0
+    },
+    {
+      "rooms": 273,
+      "count": 0
+    },
+    {
+      "rooms": 274,
+      "count": 0
+    },
+    {
+      "rooms": 275,
+      "count": 0
+    },
+    {
+      "rooms": 276,
+      "count": 0
+    },
+    {
+      "rooms": 277,
+      "count": 0
+    },
+    {
+      "rooms": 278,
+      "count": 0
+    },
+    {
+      "rooms": 279,
+      "count": 0
+    },
+    {
+      "rooms": 280,
+      "count": 0
+    },
+    {
+      "rooms": 281,
+      "count": 0
+    },
+    {
+      "rooms": 282,
+      "count": 0
+    },
+    {
+      "rooms": 283,
+      "count": 0
+    },
+    {
+      "rooms": 284,
+      "count": 0
+    },
+    {
+      "rooms": 285,
+      "count": 0
+    },
+    {
+      "rooms": 286,
+      "count": 0
+    },
+    {
+      "rooms": 287,
+      "count": 0
+    },
+    {
+      "rooms": 288,
+      "count": 0
+    },
+    {
+      "rooms": 289,
+      "count": 0
+    },
+    {
+      "rooms": 290,
+      "count": 0
+    },
+    {
+      "rooms": 291,
+      "count": 0
+    },
+    {
+      "rooms": 292,
+      "count": 0
+    },
+    {
+      "rooms": 293,
+      "count": 0
+    },
+    {
+      "rooms": 294,
+      "count": 0
+    },
+    {
+      "rooms": 295,
+      "count": 0
+    },
+    {
+      "rooms": 296,
+      "count": 0
+    },
+    {
+      "rooms": 297,
+      "count": 0
+    },
+    {
+      "rooms": 298,
+      "count": 0
+    },
+    {
+      "rooms": 299,
+      "count": 0
+    },
+    {
+      "rooms": 300,
+      "count": 0
+    },
+    {
+      "rooms": 301,
+      "count": 0
+    },
+    {
+      "rooms": 302,
+      "count": 0
+    },
+    {
+      "rooms": 303,
+      "count": 0
+    },
+    {
+      "rooms": 304,
+      "count": 0
+    },
+    {
+      "rooms": 305,
+      "count": 0
+    },
+    {
+      "rooms": 306,
+      "count": 0
+    },
+    {
+      "rooms": 307,
+      "count": 0
+    },
+    {
+      "rooms": 308,
+      "count": 0
+    },
+    {
+      "rooms": 309,
+      "count": 0
+    },
+    {
+      "rooms": 310,
+      "count": 0
+    },
+    {
+      "rooms": 311,
+      "count": 0
+    },
+    {
+      "rooms": 312,
+      "count": 0
+    },
+    {
+      "rooms": 313,
+      "count": 0
+    },
+    {
+      "rooms": 314,
+      "count": 0
+    },
+    {
+      "rooms": 315,
+      "count": 0
+    },
+    {
+      "rooms": 316,
+      "count": 0
+    },
+    {
+      "rooms": 317,
+      "count": 0
+    },
+    {
+      "rooms": 318,
+      "count": 0
+    },
+    {
+      "rooms": 319,
+      "count": 0
+    },
+    {
+      "rooms": 320,
+      "count": 0
+    },
+    {
+      "rooms": 321,
+      "count": 0
+    },
+    {
+      "rooms": 322,
+      "count": 0
+    },
+    {
+      "rooms": 323,
+      "count": 0
+    },
+    {
+      "rooms": 324,
+      "count": 0
+    },
+    {
+      "rooms": 325,
+      "count": 0
+    },
+    {
+      "rooms": 326,
+      "count": 0
+    },
+    {
+      "rooms": 327,
+      "count": 0
+    },
+    {
+      "rooms": 328,
+      "count": 0
+    },
+    {
+      "rooms": 329,
+      "count": 0
+    },
+    {
+      "rooms": 330,
+      "count": 0
+    },
+    {
+      "rooms": 331,
+      "count": 1
+    }
+  ],
+  "samples": [
+    {
+      "id": "10298",
+      "rooms": 15,
+      "connections": 14,
+      "roomTypes": [
+        0,
+        2,
+        4,
+        7,
+        8
+      ],
+      "walls": "data/samples/10298_walls.png",
+      "roomsImg": "data/samples/10298_rooms.png",
+      "graphImg": "data/samples/10298_graph.png"
+    },
+    {
+      "id": "12930",
+      "rooms": 16,
+      "connections": 17,
+      "roomTypes": [
+        0,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "walls": "data/samples/12930_walls.png",
+      "roomsImg": "data/samples/12930_rooms.png",
+      "graphImg": "data/samples/12930_graph.png"
+    },
+    {
+      "id": "1820",
+      "rooms": 17,
+      "connections": 18,
+      "roomTypes": [
+        0,
+        2,
+        4,
+        6,
+        7,
+        8
+      ],
+      "walls": "data/samples/1820_walls.png",
+      "roomsImg": "data/samples/1820_rooms.png",
+      "graphImg": "data/samples/1820_graph.png"
+    },
+    {
+      "id": "13855",
+      "rooms": 18,
+      "connections": 17,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "walls": "data/samples/13855_walls.png",
+      "roomsImg": "data/samples/13855_rooms.png",
+      "graphImg": "data/samples/13855_graph.png"
+    },
+    {
+      "id": "11876",
+      "rooms": 19,
+      "connections": 20,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        6,
+        7,
+        8
+      ],
+      "walls": "data/samples/11876_walls.png",
+      "roomsImg": "data/samples/11876_rooms.png",
+      "graphImg": "data/samples/11876_graph.png"
+    },
+    {
+      "id": "109",
+      "rooms": 20,
+      "connections": 22,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "walls": "data/samples/109_walls.png",
+      "roomsImg": "data/samples/109_rooms.png",
+      "graphImg": "data/samples/109_graph.png"
+    },
+    {
+      "id": "27090",
+      "rooms": 20,
+      "connections": 23,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "walls": "data/samples/27090_walls.png",
+      "roomsImg": "data/samples/27090_rooms.png",
+      "graphImg": "data/samples/27090_graph.png"
+    },
+    {
+      "id": "3815",
+      "rooms": 21,
+      "connections": 17,
+      "roomTypes": [
+        0,
+        4,
+        7
+      ],
+      "walls": "data/samples/3815_walls.png",
+      "roomsImg": "data/samples/3815_rooms.png",
+      "graphImg": "data/samples/3815_graph.png"
+    },
+    {
+      "id": "14138",
+      "rooms": 23,
+      "connections": 22,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "walls": "data/samples/14138_walls.png",
+      "roomsImg": "data/samples/14138_rooms.png",
+      "graphImg": "data/samples/14138_graph.png"
+    },
+    {
+      "id": "11019",
+      "rooms": 24,
+      "connections": 24,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "walls": "data/samples/11019_walls.png",
+      "roomsImg": "data/samples/11019_rooms.png",
+      "graphImg": "data/samples/11019_graph.png"
+    },
+    {
+      "id": "2010",
+      "rooms": 25,
+      "connections": 24,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "walls": "data/samples/2010_walls.png",
+      "roomsImg": "data/samples/2010_rooms.png",
+      "graphImg": "data/samples/2010_graph.png"
+    },
+    {
+      "id": "2828",
+      "rooms": 27,
+      "connections": 32,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        7,
+        8
+      ],
+      "walls": "data/samples/2828_walls.png",
+      "roomsImg": "data/samples/2828_rooms.png",
+      "graphImg": "data/samples/2828_graph.png"
+    },
+    {
+      "id": "11820",
+      "rooms": 31,
+      "connections": 29,
+      "roomTypes": [
+        0,
+        2,
+        4,
+        7,
+        8
+      ],
+      "walls": "data/samples/11820_walls.png",
+      "roomsImg": "data/samples/11820_rooms.png",
+      "graphImg": "data/samples/11820_graph.png"
+    },
+    {
+      "id": "1971",
+      "rooms": 33,
+      "connections": 31,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "walls": "data/samples/1971_walls.png",
+      "roomsImg": "data/samples/1971_rooms.png",
+      "graphImg": "data/samples/1971_graph.png"
+    },
+    {
+      "id": "2922",
+      "rooms": 36,
+      "connections": 34,
+      "roomTypes": [
+        0,
+        2,
+        4,
+        7,
+        8
+      ],
+      "walls": "data/samples/2922_walls.png",
+      "roomsImg": "data/samples/2922_rooms.png",
+      "graphImg": "data/samples/2922_graph.png"
+    },
+    {
+      "id": "23044",
+      "rooms": 41,
+      "connections": 41,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "walls": "data/samples/23044_walls.png",
+      "roomsImg": "data/samples/23044_rooms.png",
+      "graphImg": "data/samples/23044_graph.png"
+    },
+    {
+      "id": "15075",
+      "rooms": 53,
+      "connections": 60,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        7,
+        8
+      ],
+      "walls": "data/samples/15075_walls.png",
+      "roomsImg": "data/samples/15075_rooms.png",
+      "graphImg": "data/samples/15075_graph.png"
+    },
+    {
+      "id": "10485",
+      "rooms": 92,
+      "connections": 95,
+      "roomTypes": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "walls": "data/samples/10485_walls.png",
+      "roomsImg": "data/samples/10485_rooms.png",
+      "graphImg": "data/samples/10485_graph.png"
+    }
+  ],
+  "eval": {
+    "baseline": {
+      "fid": 35.97646948246893,
+      "density": 0.9095000000000001,
+      "coverage": 0.885,
+      "precision": 0.8475,
+      "recall": 0.87
+    },
+    "note": "Self-consistent local eval; retrieval baseline \u2248 real-vs-real ceiling."
+  }
+}
