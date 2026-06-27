@@ -18,6 +18,36 @@ export type ModelDoc = {
 
 export const MODELS: ModelDoc[] = [
   {
+    id: "rect-v1",
+    name: "Rectilinear (wall-aligned)",
+    family: "partition",
+    status: "trained",
+    generator: false,
+    date: "2026-06-27",
+    summary:
+      "Rule-based generator that exploits the strongest data fact: real rooms are rectangular (median rectangularity 0.99). It slices the building interior into rectangular rooms ALIGNED to the longest outer wall, sized by learned per-type areas, with balconies pushed to the facade. Best FID of any generator so far.",
+    approach:
+      "Trace the concave interior → estimate the building axis (longest edge of its min-rotated-rectangle) → recursively split the interior BY PIXEL-AREA along that axis into one rectangle per graph node (areas = learned per-type fractions; balconies ordered to the boundary) → leftover concave bits fall to the covering band → label from zoning.",
+    config: [
+      { label: "Type", value: "rule-based rectilinear partition" },
+      { label: "Key rule", value: "slice parallel to the longest outer wall" },
+      { label: "Test plans", value: "800" },
+      { label: "Compute", value: "CPU, ~seconds/plan, no training" },
+    ],
+    metrics: { fid: 80.9, density: 0.16, coverage: 0.24, note: "n=800; wall-aligned (axis-aligned was 100.0)" },
+    strengths: [
+      "Best generator FID (80.9) — rectangular rooms read as real",
+      "Wall-alignment alone cut FID from 100.0 → 80.9",
+      "Encodes mined rules: per-type areas, balconies-outside, rooms rectangular",
+      "Cheap, CPU-only, no training",
+    ],
+    limitations: [
+      "Lower density/coverage than the Voronoi partition (0.16/0.24 vs 0.28/0.27)",
+      "Needs an input access graph — not a bare-sketch Studio generator",
+      "Slice-and-dice gives strict bands; real plans nest rooms more freely",
+    ],
+  },
+  {
     id: "unet-graph-v1",
     name: "Graph-informed U-Net",
     family: "generative",
