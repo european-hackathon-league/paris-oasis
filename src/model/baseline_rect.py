@@ -124,6 +124,16 @@ def region_to_poly(mask, col_x, row_y):
 
 def predict(graph_in: nx.Graph, struct_in: np.ndarray, mapping: dict, rules: dict) -> nx.Graph:
     interior, col_x, row_y = interior_mask(struct_in)
+    return layout(graph_in, interior, col_x, row_y, mapping, rules)
+
+
+def layout(graph_in: nx.Graph, interior, col_x, row_y, mapping: dict, rules: dict) -> nx.Graph:
+    """Rectilinear layout of a given interior mask for a given access graph.
+
+    Used both with a struct_in envelope (dataset) and a hand-drawn envelope +
+    a parametric room program (Studio). Node room_type is taken directly if set,
+    else labelled from zoning_type; per-node 'area' overrides the learned size."""
+    import numpy as np
     ys, xs = np.where(interior)
     if len(ys) < 10:
         raise ValueError("interior too small")
@@ -133,7 +143,8 @@ def predict(graph_in: nx.Graph, struct_in: np.ndarray, mapping: dict, rules: dic
     u_all = xs * ct + ys * st      # along the longest outer wall
     v_all = -xs * st + ys * ct     # perpendicular to it
     nodes = list(graph_in.nodes)
-    rts = {n: label(graph_in.nodes[n].get("zoning_type"), mapping) for n in nodes}
+    rts = {n: (int(graph_in.nodes[n]["room_type"]) if graph_in.nodes[n].get("room_type") is not None
+               else label(graph_in.nodes[n].get("zoning_type"), mapping)) for n in nodes}
     area_frac = rules.get("area_frac", DEFAULT_AREA)
     ext_types = set(rules.get("exterior_types", EXTERIOR_TYPES))
 
@@ -146,7 +157,7 @@ def predict(graph_in: nx.Graph, struct_in: np.ndarray, mapping: dict, rules: dic
     mid = [n for n in order if rts[n] not in ext_types]
     h = len(ext) // 2
     order = ext[:h] + mid + ext[h:]
-    items = [(n, max(af(rts[n]), 1e-3)) for n in order]
+    items = [(n, max(float(graph_in.nodes[n].get("area") or af(rts[n])), 1e-3)) for n in order]
     idx_of = {n: i for i, n in enumerate(order)}
 
     # Recursive rectilinear split BY INTERIOR-PIXEL COUNT (not bbox geometry), so
