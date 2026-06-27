@@ -20,4 +20,5 @@ python src/model/unet_seg.py predict \
 
 echo "==> Evaluating (FID / density / coverage)"
 python src/eval/run_eval.py \
-  --real "$MSD/test/graph_out" --fake outputs/generated_unet --n "$NTEST"
+  --real "$MSD/test/graph_out" --fake outputs/generated_unet --n "$NTEST" \
+  --out outputs/full_metrics.json

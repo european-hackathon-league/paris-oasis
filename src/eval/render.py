@@ -41,11 +41,16 @@ def render_plan(G, size: int = IMG_SIZE) -> np.ndarray:
     ax = fig.add_axes([0, 0, 1, 1])  # fill the whole canvas, no margins
     ax.set_facecolor("white")
     try:
-        msd_plot.plot_floor(G, ax)
+        if G.number_of_nodes() > 0:
+            msd_plot.plot_floor(G, ax)
         ax.set_aspect("equal")
         ax.axis("off")
         ax.margins(0.02)
         img = _fig_to_array(fig)
+    except Exception:
+        # A degenerate generated plan (e.g. a single room, or odd geometry) must
+        # not crash a whole evaluation over hundreds of plans — render it blank.
+        img = np.full((size, size, 3), 255, dtype=np.uint8)
     finally:
         plt.close(fig)
     return img

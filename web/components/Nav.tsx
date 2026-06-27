@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const PAGES = [
   ["/", "Overview"],
   ["/input", "Input data"],
+  ["/live", "Live ●"],
   ["/ideas", "Ideas"],
   ["/docs", "Docs"],
 ] as const;

@@ -94,7 +94,7 @@ def vectorize(label: np.ndarray, col_vals: np.ndarray, row_vals: np.ndarray,
 
     G = nx.Graph()
     regions = []   # (node_id, room_type, dilated_mask, centroid_world, polygon_world)
-    nid = 0
+    nid = 1        # MSD node ids are 1-based; the official plot.py reads G.nodes[1]
     for cls in range(1, N_CLASSES):
         mask = label == cls
         if not mask.any():

@@ -32,7 +32,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import unet_common as U
 
-WEIGHTS = "outputs/unet.pt"
+WEIGHTS = os.environ.get("UNET_WEIGHTS", "outputs/unet.pt")
 
 
 def _device():
