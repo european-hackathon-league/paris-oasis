@@ -184,11 +184,51 @@ python src/eval/run_eval.py --real <real_dir> --fake <generated_dir> --n 500
 
 ---
 
-## 8. Roadmap
+## 8. The generative task (precise)
+
+`graph_in` and `graph_out` are **node-aligned** (same node count every id, 0/4572
+mismatches). The model gets, per id:
+- `graph_in` — the access graph: nodes with `zoning_type`, edges with `connectivity`
+  (`door`/`passage`/`entrance`). The "bubble diagram".
+- `struct_in` — `(512,512,3)`: `ch0` = **wall mask** (0 = wall), `ch1`/`ch2` =
+  world y/x coordinate per row/col (meters, same frame as `graph_out`).
+
+It must predict, per node: `geometry` (room polygon), `room_type`, `centroid`.
+
+**Regime (tested):** overlaying real `graph_out` polygons on the `struct_in` wall
+mask shows room boundaries sit *on* the given walls — so the **walls are given**;
+the task is segment-the-walls-into-rooms + label, not invent partitions.
+`zoning_type → room_type` is grouped, not 1:1 (zoning 0→Bedroom, 3→Bathroom are
+clean; 1 and 2 fan out).
+
+## 9. Baseline v1 — retrieval
+
+`src/model/baseline_retrieval.py`: for each test `graph_in`, retrieve the most
+structurally similar train sample (feature = node count + zoning histogram +
+connectivity counts) and emit its `graph_out`.
+
+```bash
+python src/model/baseline_retrieval.py --train <MSD>/train --test <MSD>/test --out outputs/generated --n 400
+python src/eval/run_eval.py --real <MSD>/test/graph_out --fake outputs/generated --n 400
+```
+
+**Result (N=400):** FID **36.0** · density **0.91** · coverage **0.89** · prec 0.85 · rec 0.87.
+
+This ≈ the real-vs-real ceiling (it outputs real plans), which closes the
+submission→eval loop and shows the metrics are **distributional and partially
+gameable** — any method emitting plausible real-shaped layouts scores well.
+
+**v2 lever (stronger, honest conditioning):** the walls are given in `struct_in`.
+Polygonize the `ch0` wall mask into room faces (handle doorway gaps), map pixels to
+world coords via `ch1`/`ch2`, label faces from the access graph, build `graph_out`.
+Geometry then matches each specific input's structure.
+
+## 10. Roadmap
 
 - [x] Repo structure + README
 - [x] Data visualization (`src/visualize.py`) → `outputs/samples_overview.png`
 - [x] Download & inspect real CSV columns (confirmed: `roomtype`, walls/openings)
 - [x] Evaluation pipeline (render → features → FID + density/coverage) — validated
-- [ ] Baseline model (outline → rooms / graph)
-- [ ] Improve & iterate
+- [x] Baseline v1 — retrieval (FID 36 @ N=400)
+- [ ] Baseline v2 — wall-mask segmentation → labelled rooms
+- [ ] Confirm official submission format vs Amine's slides
