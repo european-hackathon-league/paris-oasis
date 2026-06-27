@@ -6,22 +6,28 @@ import Footer from "../components/Footer";
 
 const PAGES = [
   {
-    href: "/input",
-    eyebrow: "01 · Input data",
-    title: "What the model is given",
-    body: "Raw data — the tables, columns and sample rows — plus an interactive look at the walls, rooms and access graph for real apartments.",
+    href: "/studio",
+    eyebrow: "Studio",
+    title: "Draw → generate",
+    body: "Sketch walls with your pencil; the trained model lays out the rooms inside and documents what goes where.",
   },
   {
-    href: "/ideas",
-    eyebrow: "02 · Ideas",
-    title: "How we solve it",
-    body: "The current best model, visualized end to end, and five strategies to push further — each with its own diagram, status and fit.",
+    href: "/live",
+    eyebrow: "Live",
+    title: "Train & explore, live",
+    body: "Browse the real 16 GB dataset, launch a training run on the GPU and watch it learn, then compare generated plans to the truth.",
   },
   {
-    href: "/docs",
-    eyebrow: "03 · Docs",
-    title: "Evaluation & literature",
-    body: "How plans are scored (FID, density, coverage) and the full reading list — papers behind the project, openable as PDFs.",
+    href: "/models",
+    eyebrow: "Models",
+    title: "Documented models",
+    body: "One card per model we build — approach, config and measured FID / density / coverage. New models land here automatically.",
+  },
+  {
+    href: "/research",
+    eyebrow: "Research",
+    title: "Ideas, methods & papers",
+    body: "The strategies we're weighing, how plans are scored, the dataset specs and the full reading list behind the project.",
   },
 ];
 
@@ -34,20 +40,21 @@ export default function Home() {
       {/* hero */}
       <div className="grid-bg border-b border-slate-200">
         <div className="mx-auto max-w-6xl px-5 py-20 md:py-28">
-          <Chip color="#4f46e5">Modified Swiss Dwellings · ECCV 2024</Chip>
+          <Chip color="#4f46e5">Modified Swiss Dwellings · live on an AMD MI300X</Chip>
           <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight text-slate-900 md:text-6xl">
-            Generating floor plans,<br />room by room.
+            Draw it. Train it.<br />Generate the floor plan.
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-slate-600">
-            An interactive hub for the challenge: {s.apartments.toLocaleString()} apartments, their wall
-            structures, room layouts and access graphs — the data, our ideas, and how generated plans are scored.
+            A live tool for floor-plan generation: sketch a structure and the model lays out the rooms,
+            train new models on the GPU and watch them learn, and browse {s.apartments.toLocaleString()} real
+            apartments — all from the browser.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/input" className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
-              Explore the input data
+            <Link href="/studio" className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
+              ✦ Open the Studio
             </Link>
-            <Link href="/ideas" className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:border-slate-400">
-              See our ideas
+            <Link href="/live" className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:border-slate-400">
+              Watch it train live
             </Link>
           </div>
 
@@ -86,8 +93,9 @@ export default function Home() {
         <Section eyebrow="Current status" title="Best model so far">
           <div className="grid gap-6 md:grid-cols-[1.3fr_1fr] md:items-center">
             <p className="max-w-xl text-slate-600">
-              A conditioned retrieval baseline already scores near the real-vs-real ceiling. It&apos;s the
-              starting point we build on — see the Ideas page for how, and what comes next.
+              A structure-aware retrieval baseline scores near the real-vs-real ceiling, while the
+              graph-informed U-Net is our honest generator — the one that powers the Studio. Every model
+              is documented on the <Link href="/models" className="text-indigo-600 underline">Models</Link> page.
             </p>
             {data.eval.baseline && (
               <div className="grid grid-cols-3 gap-3">

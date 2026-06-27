@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 type Config = { size: number; epochs: number; batch: number; ntrain: number; ntest: number };
 type Status = {
   running: boolean;
+  gpuBusy: boolean;
+  foreignRun: boolean;
   status: string;
   config: Config | null;
   startedAt: number | null;
@@ -73,6 +75,7 @@ export default function TrainPanel() {
   };
 
   const stop = async () => {
+    if (!confirm("Stop the running training? Progress since the last epoch is lost.")) return;
     setBusy(true);
     try {
       await fetch("/api/train", {
@@ -84,6 +87,8 @@ export default function TrainPanel() {
   };
 
   const running = st?.running;
+  const foreign = st?.foreignRun;          // a training started outside this panel
+  const locked = running || foreign;        // GPU is occupied -> no new run
   const last = st?.epochs?.[st.epochs.length - 1];
   const cur = last?.epoch ?? 0;
   const tot = last?.total ?? st?.config?.epochs ?? cfg.epochs;
@@ -104,7 +109,7 @@ export default function TrainPanel() {
         {PRESETS.map((p) => (
           <button
             key={p.name}
-            disabled={running}
+            disabled={locked}
             onClick={() => setCfg(p.cfg)}
             className="rounded-lg border border-slate-200 px-3 py-2 text-left text-sm hover:bg-slate-50 disabled:opacity-50"
           >
@@ -120,19 +125,29 @@ export default function TrainPanel() {
           <label key={k} className="text-xs font-medium text-slate-500">
             {label}
             <input
-              type="number" min={lo} max={hi} value={cfg[k]} disabled={running}
+              type="number" min={lo} max={hi} value={cfg[k]}
               onChange={(e) => setCfg((c) => ({ ...c, [k]: Number(e.target.value) }))}
+              disabled={locked}
               className="mt-1 w-full rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-slate-900 outline-none focus:border-indigo-400 disabled:bg-slate-50"
             />
           </label>
         ))}
       </div>
 
+      {/* GPU-busy guard banner (a run started outside this panel) */}
+      {foreign && (
+        <div className="mt-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+          The GPU is busy with a training run started elsewhere. Starting is disabled until it finishes — one run at a time.
+        </div>
+      )}
+
       {/* actions */}
       <div className="mt-4 flex items-center gap-3">
         {!running ? (
-          <button onClick={start} disabled={busy}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50">
+          <button onClick={start} disabled={busy || locked}
+            title={foreign ? "GPU busy with another run" : ""}
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50">
             ▶ Start training run
           </button>
         ) : (
@@ -141,9 +156,9 @@ export default function TrainPanel() {
             ■ Stop
           </button>
         )}
-        <span className={`inline-flex items-center gap-1.5 text-sm ${running ? "text-emerald-600" : "text-slate-400"}`}>
-          <span className={`h-2 w-2 rounded-full ${running ? "animate-pulse bg-emerald-500" : "bg-slate-300"}`} />
-          {running ? `running · ${st?.phase || "train"}` : st?.status ?? "idle"}
+        <span className={`inline-flex items-center gap-1.5 text-sm ${running ? "text-emerald-600" : foreign ? "text-amber-600" : "text-slate-400"}`}>
+          <span className={`h-2 w-2 rounded-full ${running ? "animate-pulse bg-emerald-500" : foreign ? "animate-pulse bg-amber-500" : "bg-slate-300"}`} />
+          {running ? `running · ${st?.phase || "train"}` : foreign ? "GPU busy (external run)" : st?.status ?? "idle"}
         </span>
         {err && <span className="text-sm text-rose-600">{err}</span>}
       </div>

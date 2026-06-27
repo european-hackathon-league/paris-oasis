@@ -1,11 +1,25 @@
 import { NextRequest } from "next/server";
-import { spawn } from "node:child_process";
+import { spawn, execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { openSync } from "node:fs";
 import path from "node:path";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const execFileP = promisify(execFile);
+
+// Detect ANY training process on the box (web-started OR manual), so we never
+// launch a second run and overload the single GPU.
+async function trainingProcess(): Promise<boolean> {
+  try {
+    const { stdout } = await execFileP("pgrep", ["-f", "unet_seg.py train"], { timeout: 5000 });
+    return stdout.trim().length > 0;
+  } catch {
+    return false; // pgrep exits 1 when nothing matches
+  }
+}
 
 const ROOT = path.resolve(process.cwd(), "..");
 const OUTPUTS = path.join(ROOT, "outputs");
@@ -62,11 +76,16 @@ export async function GET() {
   let log = "";
   try { log = await readFile(LOG, "utf8"); } catch { /* none yet */ }
   const running = !!st && alive(st.pid);
+  const gpuBusy = await trainingProcess();
+  // A training is happening that this panel did not start (e.g. a manual run)
+  const foreignRun = gpuBusy && !running;
   const parsed = parseLog(log);
   let status = st?.status ?? "idle";
   if (st && st.status === "running" && !running) status = "done"; // process exited
   return Response.json({
     running,
+    gpuBusy,
+    foreignRun,
     status,
     config: st?.config ?? null,
     startedAt: st?.startedAt ?? null,
@@ -93,7 +112,12 @@ export async function POST(req: NextRequest) {
   if (action === "start") {
     const existing = await readState();
     if (existing && alive(existing.pid)) {
-      return Response.json({ ok: false, error: "a training run is already active" }, { status: 409 });
+      return Response.json({ ok: false, error: "A training run is already active — stop it first." }, { status: 409 });
+    }
+    // Guard against ANY training process (e.g. a manually started run) so we
+    // never run two trainings at once and overload the single GPU.
+    if (await trainingProcess()) {
+      return Response.json({ ok: false, error: "The GPU is already busy with another training run. Wait for it to finish." }, { status: 409 });
     }
     const config: Config = {
       size: clamp(body?.size, 64, 512, 128),

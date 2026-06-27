@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 
 const PAGES = [
   ["/", "Overview"],
-  ["/input", "Input data"],
+  ["/studio", "Studio"],
   ["/live", "Live ●"],
-  ["/ideas", "Ideas"],
-  ["/docs", "Docs"],
+  ["/models", "Models"],
+  ["/research", "Research"],
 ] as const;
 
 export default function Nav() {
