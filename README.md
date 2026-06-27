@@ -25,15 +25,25 @@ apartment yields a training pair automatically.
 ## 2. Data
 
 - **Source:** [Kaggle — Modified Swiss Dwellings](https://www.kaggle.com/datasets/caspervanengelenburg/modified-swiss-dwellings/data)
-- **File:** `mds_V2_5.372k.csv` (~5,372 apartments) — place it in `data/`
+- **File:** `mds_V2_5.372k.csv` (383 MB) in `data/` — **1,086,846 geometries**, **5,372 floors** (`plan_id`), **18,902 apartments** (`unit_id`).
 - **Format:** each row is a geometry stored as a **WKT** string; load with GeoPandas/Shapely.
+
+Confirmed columns: `apartment_id, site_id, building_id, plan_id, floor_id, unit_id,
+area_id, unit_usage, entity_type, entity_subtype, geom, elevation, height, zoning, roomtype`.
 
 | Column | Meaning |
 |---|---|
 | `geom` | Geometry (polygon) as WKT |
 | `plan_id` | A whole **floor** (may contain several apartments) |
 | `unit_id` | A single **apartment** = one training example |
-| `entity_type` | Kind of geometry; `'area'` = a room |
+| `entity_type` | `area` = room · `separator` = wall · `opening` = door/window |
+| `roomtype` | Balcony, Bathroom, Bedroom, Corridor, Kitchen, Livingroom, Storeroom, Structure |
+
+`entity_type` breakdown: `separator` 602,196 · `opening` 281,320 · `area` 203,330.
+
+> The Kaggle archive also ships a **16 GB** `modified-swiss-dwellings-v2/` folder with
+> `train`/`test` splits (`struct_in`, `graph_in`, `graph_out`, `full_out`) — pre-rendered
+> ML-ready inputs/targets. Kept on disk in `~/Downloads/archive/`, not in this repo.
 
 ```python
 import pandas as pd, geopandas as gpd
@@ -143,8 +153,8 @@ python src/visualize.py --unit-id 64314 # one specific apartment
 ## 8. Roadmap
 
 - [x] Repo structure + README
-- [x] Data visualization (`src/visualize.py`)
-- [ ] Download & inspect real CSV columns (confirm room-type field)
+- [x] Data visualization (`src/visualize.py`) → `outputs/samples_overview.png`
+- [x] Download & inspect real CSV columns (confirmed: `roomtype`, walls/openings)
 - [ ] Evaluation pipeline (render → features → FID + density/coverage)
 - [ ] Baseline model (outline → rooms)
 - [ ] Improve & iterate
