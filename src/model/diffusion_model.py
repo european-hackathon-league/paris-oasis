@@ -133,15 +133,15 @@ def train(args):
         net.train()
         for k in range(0, M, bs):
             idx = perm[k:k + bs]
-            oh = F.one_hot(tgt[idx], N_CLASS).permute(0, 3, 1, 2).float() * 2 - 1
-            x0 = oh.to(dev); cond = free[idx][:, None].to(dev)
+            ti = tgt[idx].to(dev)
+            oh = F.one_hot(ti, N_CLASS).permute(0, 3, 1, 2).float() * 2 - 1
+            x0 = oh; cond = free[idx][:, None].to(dev)
             B = x0.shape[0]
             t = torch.randint(0, T, (B,), device=dev)
             ab = abar[t][:, None, None, None]
-            noise = torch.randn_like(x0)
-            xt = ab.sqrt() * x0 + (1 - ab).sqrt() * noise
-            pred = net(xt, cond, t)
-            loss = F.mse_loss(pred, noise)
+            xt = ab.sqrt() * x0 + (1 - ab).sqrt() * torch.randn_like(x0)
+            pred = net(xt, cond, t)                      # x0-prediction
+            loss = F.mse_loss(pred, x0) + 0.5 * F.cross_entropy(pred, ti)
             opt.zero_grad(); loss.backward(); opt.step()
             tot += loss.item() * B
         if (ep + 1) % 10 == 0 or ep == 0:
@@ -174,9 +174,9 @@ def sample(dev, cond, steps=100):
         x = torch.randn(1, N_CLASS, RES, RES, device=dev)
         for i, ti in enumerate(ts):
             t = torch.full((1,), ti, device=dev)
-            eps = net(x, cond, t)
             ab = abar[ti]
-            x0 = ((x - (1 - ab).sqrt() * eps) / ab.sqrt()).clamp(-1.5, 1.5)
+            x0 = net(x, cond, t).clamp(-1.5, 1.5)        # x0-prediction
+            eps = (x - ab.sqrt() * x0) / (1 - ab).sqrt()
             tp = ts[i + 1] if i + 1 < len(ts) else None
             if tp is None:
                 x = x0
