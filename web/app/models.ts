@@ -18,6 +18,36 @@ export type ModelDoc = {
 
 export const MODELS: ModelDoc[] = [
   {
+    id: "diffusion-v1",
+    name: "Conditional raster diffusion",
+    family: "generative",
+    status: "trained",
+    generator: false,
+    date: "2026-06-28",
+    summary:
+      "A working, genuinely generative diffusion model — DIVERSE plausible plans for the same footprint (unlike the deterministic U-Net). GSDiff's junction-graph diffusion couldn't close plans; diffusing the room-type RASTER conditioned on the envelope always closes and works reliably.",
+    approach:
+      "Diffuse the 10-channel one-hot room-type map (in [-1,1]) at 64 px, conditioned on the interior mask. A DDPM U-Net predicts x0 (clean map) + a cross-entropy term on the room classes (predicting noise gave a degenerate all-uniform sample). DDIM sampling → argmax → vectorize → graph_out.",
+    config: [
+      { label: "Type", value: "DDPM raster diffusion (x0-pred)" },
+      { label: "Conditioning", value: "building envelope" },
+      { label: "Resolution", value: "64 px" },
+      { label: "Sampler", value: "DDIM, 100 steps" },
+      { label: "Hardware", value: "AMD MI300X" },
+    ],
+    metrics: { fid: 103.1, density: 0.100, coverage: 0.115, note: "n=800; diverse samples per envelope" },
+    strengths: [
+      "Genuinely generative — diverse plans per envelope (every other model here is deterministic)",
+      "Best density / coverage of the learned generators",
+      "Closes reliably (raster → vectorize), unlike the GSDiff graph approach",
+    ],
+    limitations: [
+      "64 px → jagged geometry; FID still behind the rule-based Rectilinear (80.9)",
+      "Background-heavy (unweighted classes) → somewhat sparse rooms",
+      "128 px + class-weighted loss should push it further (next step)",
+    ],
+  },
+  {
     id: "refine-v1",
     name: "Refinement (U-Net → clean)",
     family: "generative",
