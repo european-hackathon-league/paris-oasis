@@ -2,17 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const PAGES = [
   ["/", "Overview"],
   ["/studio", "Studio"],
-  ["/live", "Live ●"],
+  ["/live", "Live"],
   ["/models", "Models"],
   ["/research", "Research"],
 ] as const;
 
 export default function Nav() {
   const path = usePathname();
+  const [liveActive, setLiveActive] = useState(false);
+
+  // Show the "Live" dot only while something is actually training (a run started
+  // here, or any external/CLI run on the GPU).
+  useEffect(() => {
+    let alive = true;
+    const poll = () =>
+      fetch("/api/train", { cache: "no-store" })
+        .then((r) => r.json())
+        .then((d) => { if (alive) setLiveActive(!!(d.running || d.gpuBusy)); })
+        .catch(() => {});
+    poll();
+    const t = setInterval(poll, 5000);
+    return () => { alive = false; clearInterval(t); };
+  }, []);
+
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-paper/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
@@ -32,6 +49,9 @@ export default function Nav() {
                 }`}
               >
                 {label}
+                {href === "/live" && liveActive && (
+                  <span className="ml-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500 align-middle" title="a training run is active" />
+                )}
               </Link>
             );
           })}

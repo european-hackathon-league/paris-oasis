@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
     }
   }
   const program = JSON.stringify({ rooms, areas });
+  const model = body?.model === "partition" ? "partition" : "rect";
 
   await mkdir(DIR, { recursive: true });
   const stamp = `${Date.now()}_${Math.floor(performance.now())}`;
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
   let doc: unknown;
   try {
     const { stdout } = await execFileP(
-      PY, [SCRIPT, "--in", sketch, "--out", plan, "--program", program],
+      PY, [SCRIPT, "--in", sketch, "--out", plan, "--program", program, "--model", model],
       { cwd: ROOT, timeout: 60000, maxBuffer: 4 << 20 },
     );
     doc = JSON.parse(stdout.trim().split("\n").filter(Boolean).pop() || "{}");

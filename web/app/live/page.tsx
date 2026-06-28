@@ -39,9 +39,10 @@ export default function LivePage() {
       <div className="border-y border-slate-200 bg-white">
         <Section eyebrow="Train" title="Launch a training run on the MI300X">
           <p className="mb-8 max-w-2xl text-slate-600">
-            Configure and start a real U-Net training run on the GPU — straight from the browser. Watch the
-            loss fall live, then it predicts the test split and computes FID / density / coverage
-            automatically. Pick a preset or set the knobs yourself.
+            A live showcase: start a real training run on the GPU straight from the browser, watch the loss fall,
+            and when it finishes it predicts the test split and scores FID / density / coverage automatically.
+            Pick a preset (quick, standard, full) or set the knobs yourself. The panel also shows when a run is
+            already going - including the other models we train from the command line.
           </p>
           <TrainPanel />
         </Section>

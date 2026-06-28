@@ -20,7 +20,11 @@ export async function GET() {
       try { nGenerated = (await readdir(path.join(STORE, id, "generated"))).filter((f) => f.endsWith(".pickle")).length; } catch { /* keep */ }
       let hasWeights = false;
       try { await stat(path.join(STORE, id, "weights.pt")); hasWeights = true; } catch { /* no weights */ }
-      models.push({ ...meta, id, nGenerated, hasWeights });
+      // Sketch-capable = can generate from the bare structure alone. Marked by an
+      // explicit inference engine in meta.json ("unet" | "centroid"); everything
+      // else needs an access graph and can't run from a free sketch.
+      const sketch = meta.engine === "unet" || meta.engine === "centroid";
+      models.push({ ...meta, id, nGenerated, hasWeights, sketch });
     } catch { /* skip incomplete dirs */ }
   }
   models.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));

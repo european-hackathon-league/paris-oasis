@@ -39,6 +39,25 @@ def _save(fig, out, size):
     plt.close(fig)
 
 
+def _postprocess(out, crop=False, rot=0):
+    """Optionally trim the white margins and rotate the saved PNG. Lets thumbnails
+    show the plan bigger (rotate a portrait plan 90 deg -> fills a wide box)."""
+    if not crop and not rot:
+        return
+    from PIL import Image, ImageChops
+    im = Image.open(out).convert("RGB")
+    if crop:
+        bg = Image.new("RGB", im.size, (255, 255, 255))
+        bbox = ImageChops.difference(im, bg).getbbox()
+        if bbox:
+            pad = 6
+            l, t, r, b = bbox
+            im = im.crop((max(0, l - pad), max(0, t - pad), min(im.width, r + pad), min(im.height, b + pad)))
+    if rot:
+        im = im.rotate(rot, expand=True, fillcolor=(255, 255, 255))
+    im.save(out)
+
+
 def render_walls(split_dir, sid, out, size):
     s = np.load(os.path.join(split_dir, "struct_in", f"{sid}.npy")).astype(np.float32)
     free = (s[..., 0] > 127).astype(np.float32)  # 1 free, 0 wall
@@ -49,7 +68,7 @@ def render_walls(split_dir, sid, out, size):
     _save(fig, out, size)
 
 
-def render_rooms(split_dir, sid, out, size, pickle_path=None):
+def render_rooms(split_dir, sid, out, size, pickle_path=None, overlay_real_dir=None):
     import plot as msd_plot  # noqa
     p = pickle_path or os.path.join(split_dir, "graph_out", f"{sid}.pickle")
     with open(p, "rb") as fh:
@@ -62,6 +81,25 @@ def render_rooms(split_dir, sid, out, size, pickle_path=None):
             msd_plot.plot_floor(G, ax)
     except Exception:
         pass  # degenerate generated plan -> blank canvas
+    # Optionally overlay the REAL plan's wall structure (room boundaries) in the
+    # same world frame, so you can see how the generated rooms fit the actual
+    # building. Same coordinates as plot_floor -> overlays align.
+    if overlay_real_dir:
+        try:
+            with open(os.path.join(overlay_real_dir, f"{sid}.pickle"), "rb") as fh:
+                RG = pickle.load(fh)
+            for _, d in RG.nodes(data=True):
+                geom = d.get("geometry")
+                if not geom:
+                    continue
+                arr = np.asarray(geom, dtype=float)
+                if arr.ndim != 2 or len(arr) < 2:
+                    continue
+                xs = np.append(arr[:, 0], arr[0, 0])
+                ys = np.append(arr[:, 1], arr[0, 1])
+                ax.plot(xs, ys, color="#0b1220", lw=1.4, alpha=0.6, zorder=6)
+        except Exception:
+            pass  # no real reference -> just the generated plan
     ax.set_aspect("equal"); ax.axis("off"); ax.margins(0.02)
     _save(fig, out, size)
 
@@ -105,6 +143,9 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--size", type=int, default=512)
     ap.add_argument("--pred-dir", default=None, help="dir of generated graph_out pickles for kind=pred")
+    ap.add_argument("--overlay-real", default=None, help="dir of REAL graph_out pickles to overlay (wall structure)")
+    ap.add_argument("--crop", action="store_true", help="trim white margins from the saved PNG")
+    ap.add_argument("--rot", type=int, default=0, help="rotate the saved PNG by N degrees")
     a = ap.parse_args()
 
     split_dir = os.path.join(a.msd, a.split)
@@ -119,7 +160,9 @@ def main():
         if not a.pred_dir:
             sys.exit("--pred-dir required for kind=pred")
         render_rooms(split_dir, a.id, a.out, a.size,
-                     pickle_path=os.path.join(a.pred_dir, f"{a.id}.pickle"))
+                     pickle_path=os.path.join(a.pred_dir, f"{a.id}.pickle"),
+                     overlay_real_dir=a.overlay_real)
+    _postprocess(a.out, crop=a.crop, rot=a.rot)
     print(a.out)
 
 

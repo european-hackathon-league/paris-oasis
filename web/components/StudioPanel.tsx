@@ -6,7 +6,7 @@ import { strokesToSegments, segmentsToDataURL, Seg } from "../lib/straighten";
 
 type Room = { type: number; name: string; color: string; count: number };
 type Doc = { n_rooms: number; rooms: Room[]; weights?: string; n_connections?: number; requested?: number };
-type Model = { id: string; name: string; status: string; hasWeights: boolean; metrics?: { fid?: number } | null };
+type Model = { id: string; name: string; status: string; hasWeights: boolean; sketch?: boolean; metrics?: { fid?: number } | null };
 type Phase = "idle" | "building" | "running" | "done";
 type Mode = "sketch" | "program";
 
@@ -67,12 +67,14 @@ export default function StudioPanel() {
   const [fs, setFs] = useState(false);
   const [mode, setMode] = useState<Mode>("sketch");
   const [program, setProgram] = useState<Record<number, number>>(DEFAULT_PROGRAM);
+  const [progModel, setProgModel] = useState<"rect" | "partition">("rect");
 
   useEffect(() => {
     fetch("/api/models", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => {
-        const usable: Model[] = (d.models || []).filter((m: Model) => m.hasWeights);
+        // only models that can actually generate from a bare sketch
+        const usable: Model[] = (d.models || []).filter((m: Model) => m.hasWeights && m.sketch);
         setModels(usable);
         if (usable.length) setModel((cur) => cur || usable[0].id);
       })
@@ -104,7 +106,7 @@ export default function StudioPanel() {
     try {
       const image = segmentsToDataURL(segs, SIZE, 6);
       const endpoint = mode === "program" ? "/api/parametric" : "/api/canvas";
-      const body = mode === "program" ? { image, rooms: programRooms } : { image, rooms, model };
+      const body = mode === "program" ? { image, rooms: programRooms, model: progModel } : { image, rooms, model };
       const r = await fetch(endpoint, {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
       });
@@ -132,10 +134,10 @@ export default function StudioPanel() {
 
   // ---- shared sub-views -----------------------------------------------------
   const ModelSelect = (
-    <label className="flex items-center gap-2 text-xs font-medium text-slate-500">
+    <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white pl-3 text-xs font-medium text-slate-500">
       Model
       <select value={model} onChange={(e) => setModel(e.target.value)}
-        className="rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-slate-900">
+        className="h-full rounded-r-lg border-l border-slate-200 bg-transparent px-2 text-sm text-slate-900 outline-none">
         {models.length === 0 && <option value="">no trained model</option>}
         {models.map((m) => (
           <option key={m.id} value={m.id}>{m.name}{m.metrics?.fid != null ? ` · FID ${m.metrics.fid.toFixed(0)}` : ""}</option>
@@ -144,18 +146,29 @@ export default function StudioPanel() {
     </label>
   );
 
+  const ProgramModelSelect = (
+    <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white pl-3 text-xs font-medium text-slate-500">
+      Model
+      <select value={progModel} onChange={(e) => setProgModel(e.target.value as "rect" | "partition")}
+        className="h-full rounded-r-lg border-l border-slate-200 bg-transparent px-2 text-sm text-slate-900 outline-none">
+        <option value="rect">Rectilinear · rectangles</option>
+        <option value="partition">Partition · Voronoi</option>
+      </select>
+    </label>
+  );
+
   const GenerateBtn = (
     <button onClick={generate} disabled={busy || (mode === "sketch" && !model)}
-      className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50">
+      className="inline-flex h-9 items-center rounded-lg bg-indigo-600 px-5 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50">
       {phase === "running" ? "Generating…" : phase === "building" ? "Building outline…" : "✨ Generate"}
     </button>
   );
 
   const ModeToggle = (
-    <div className="inline-flex overflow-hidden rounded-lg border border-slate-200">
+    <div className="inline-flex h-9 overflow-hidden rounded-lg border border-slate-200">
       {(["sketch", "program"] as Mode[]).map((mm) => (
         <button key={mm} onClick={() => setMode(mm)}
-          className={`px-3 py-1.5 text-sm font-medium ${mode === mm ? "bg-indigo-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`}>
+          className={`flex h-full items-center px-3.5 text-sm font-medium transition ${mode === mm ? "bg-indigo-600 text-white" : "bg-white text-slate-600 hover:bg-slate-50"}`}>
           {mm === "sketch" ? "✏️ Sketch → model" : "📐 Program"}
         </button>
       ))}
@@ -167,7 +180,7 @@ export default function StudioPanel() {
       <div className="mb-2.5 text-sm font-semibold text-slate-900">
         Room program <span className="font-normal text-slate-400">— {programRooms.reduce((a, b) => a + b.count, 0)} rooms, guaranteed</span>
       </div>
-      <div className="grid grid-cols-2 gap-x-5 gap-y-2 sm:grid-cols-3">
+      <div className="grid grid-cols-2 gap-x-5 gap-y-2.5 sm:grid-cols-3 lg:grid-cols-4">
         {ROOM_TYPES.map((rt) => (
           <div key={rt.type} className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-1.5 text-sm text-slate-700">
@@ -188,13 +201,18 @@ export default function StudioPanel() {
 
   const DrawSide = (
     <div className="flex h-full flex-col">
-      <div className="mb-2 flex flex-wrap items-center gap-2">
-        <span className="rounded-lg bg-slate-900 px-3 py-1.5 text-sm font-medium text-white">{mode === "program" ? "✏️ Draw outline" : "✏️ Draw walls"}</span>
-        <label className="flex items-center gap-1.5 text-xs text-slate-500">thickness
-          <input type="range" min={3} max={16} value={thickness} onChange={(e) => setThickness(Number(e.target.value))} />
-        </label>
-        <button onClick={() => draw.current?.undo()} className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm text-slate-700 hover:bg-slate-50">↶ Undo</button>
-        <button onClick={reset} className="rounded-lg border border-slate-200 px-2.5 py-1.5 text-sm text-slate-700 hover:bg-slate-50">Clear</button>
+      <div className="mb-3 flex h-9 items-center justify-between gap-2">
+        <span className="inline-flex h-9 items-center rounded-lg bg-slate-900 px-3 text-sm font-medium text-white">
+          {mode === "program" ? "✏️ Draw outline" : "✏️ Draw walls"}
+        </span>
+        <div className="flex items-center gap-2">
+          <label className="hidden items-center gap-1.5 text-xs text-slate-500 sm:flex">
+            thickness
+            <input type="range" min={3} max={16} value={thickness} onChange={(e) => setThickness(Number(e.target.value))} className="w-16 accent-indigo-600" />
+          </label>
+          <button onClick={() => draw.current?.undo()} className="inline-flex h-9 items-center rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 hover:bg-slate-50">↶ Undo</button>
+          <button onClick={reset} className="inline-flex h-9 items-center rounded-lg border border-slate-200 px-2.5 text-sm text-slate-700 hover:bg-slate-50">Clear</button>
+        </div>
       </div>
       <div className="relative aspect-square w-full max-h-full overflow-hidden rounded-xl border border-slate-300 shadow-inner">
         <DrawCanvas ref={draw} lineWidth={thickness} className="h-full w-full" />
@@ -204,7 +222,7 @@ export default function StudioPanel() {
 
   const ResultSide = (
     <div className="flex h-full flex-col">
-      <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-900">
+      <div className="mb-3 flex h-9 items-center gap-2 text-sm font-medium text-slate-900">
         <span className={`h-2 w-2 rounded-full ${busy ? "animate-pulse bg-indigo-500" : phase === "done" ? "bg-emerald-500" : "bg-slate-300"}`} />
         {phase === "building" ? "Straightening your walls…" : phase === "running" ? "Model laying out rooms…" : phase === "done" ? "Generated apartment" : "Generated apartment"}
       </div>
@@ -234,18 +252,17 @@ export default function StudioPanel() {
           <span className="text-sm font-semibold text-slate-900">Studio · showcase</span>
           {ModeToggle}
           {mode === "sketch" && ModelSelect}
+          {mode === "program" && ProgramModelSelect}
           <div className="ml-auto flex items-center gap-2">
             {GenerateBtn}
-            <button onClick={reset} className="rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">Clear</button>
-            <button onClick={toggleFs} className="rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">✕ Exit</button>
+            <button onClick={reset} className="inline-flex h-9 items-center rounded-lg border border-slate-200 px-3 text-sm text-slate-700 hover:bg-slate-50">Clear</button>
+            <button onClick={toggleFs} className="inline-flex h-9 items-center rounded-lg border border-slate-300 px-3 text-sm font-medium text-slate-700 hover:bg-slate-50">✕ Exit</button>
           </div>
         </div>
         {err && <div className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{err}</div>}
+        {mode === "program" && ProgramEditor}
         <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-2">
-          <div className="flex min-h-0 flex-col">
-            {mode === "program" && ProgramEditor}
-            <div className="min-h-0 flex-1">{DrawSide}</div>
-          </div>
+          <div className="min-h-0">{DrawSide}</div>
           <div className="min-h-0">{ResultSide}</div>
         </div>
       </div>
@@ -255,27 +272,38 @@ export default function StudioPanel() {
   // ---- normal layout --------------------------------------------------------
   return (
     <div ref={wrapper}>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
+      {/* header — mode on the left, actions on the right (always one line) */}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         {ModeToggle}
-        {mode === "sketch" && ModelSelect}
-        {mode === "sketch" && (
-          <label className="flex items-center gap-2 text-xs font-medium text-slate-500">Room hint
-            <input type="number" min={0} max={40} value={rooms} onChange={(e) => setRooms(Number(e.target.value))}
-              className="w-20 rounded-lg border border-slate-200 px-2 py-1.5 text-sm text-slate-900" />
-            <span className="text-slate-400">(0 = auto)</span>
-          </label>
-        )}
-        <button onClick={toggleFs} className="ml-auto rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">⛶ Fullscreen</button>
-        {GenerateBtn}
+        <div className="flex items-center gap-2">
+          <button onClick={toggleFs} className="inline-flex h-9 items-center rounded-lg border border-slate-300 px-3 text-sm font-medium text-slate-700 hover:bg-slate-50">⛶ Fullscreen</button>
+          {GenerateBtn}
+        </div>
       </div>
-      {mode === "program" && (
-        <p className="mb-4 text-sm text-slate-500">Set the room program, draw the outer outline, and the
-          rule-based <strong>Rectilinear</strong> model lays out exactly those rooms inside it.</p>
+
+      {/* per-mode configuration strip */}
+      {mode === "sketch" ? (
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          {ModelSelect}
+          <label className="inline-flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-500">
+            Room hint
+            <input type="number" min={0} max={40} value={rooms} onChange={(e) => setRooms(Number(e.target.value))}
+              className="w-12 bg-transparent text-sm text-slate-900 outline-none" />
+            <span className="text-slate-400">0 = auto</span>
+          </label>
+        </div>
+      ) : (
+        <>
+          <div className="mb-3 flex flex-wrap items-center gap-3">{ProgramModelSelect}</div>
+          {ProgramEditor}
+          <p className="mb-4 text-sm text-slate-500">Set the room program, draw the outer outline, and the chosen
+            rule-based model lays out exactly those rooms inside it.</p>
+        </>
       )}
+
       {err && <div className="mb-4 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{err}</div>}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid items-start gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          {mode === "program" && ProgramEditor}
           {DrawSide}
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

@@ -23,9 +23,13 @@ export async function GET(req: NextRequest) {
   const kind = KINDS.has(sp.get("kind") || "") ? sp.get("kind")! : "rooms";
   const size = Math.min(Math.max(parseInt(sp.get("size") || "512", 10) || 512, 128), 768);
   const predDir = (sp.get("pred") || "").replace(/[^a-zA-Z0-9_\-]/g, "");
+  const fit = sp.get("fit") === "1"; // overlay the real wall structure on a generated plan
+  const crop = sp.get("crop") === "1"; // trim white margins
+  const rot = [90, 180, 270].includes(parseInt(sp.get("rot") || "0", 10)) ? parseInt(sp.get("rot")!, 10) : 0;
   if (!id) return new Response("missing id", { status: 400 });
 
-  const tag = kind === "pred" ? `pred-${predDir}` : kind === "truth" ? `truth-${predDir}` : kind;
+  const base = kind === "pred" ? `pred-${predDir}${fit ? "-fit" : ""}` : kind === "truth" ? `truth-${predDir}` : kind;
+  const tag = `${base}${crop ? "-c" : ""}${rot ? `-r${rot}` : ""}`;
   const outPath = path.join(CACHE, `${split}_${id}_${tag}_${size}.png`);
 
   try {
@@ -38,6 +42,14 @@ export async function GET(req: NextRequest) {
       // pred = model id -> its generated predictions in the model store
       args = ["--split", split, "--id", id, "--kind", "pred", "--out", outPath, "--size", String(size),
         "--pred-dir", path.join(ROOT, "outputs", "models", predDir, "generated")];
+      if (fit) {
+        // overlay the REAL wall structure: the model's own real reference if it has
+        // one (outline-only track), else the per-floor test ground truth.
+        let realDir = path.join(ROOT, "data", "modified-swiss-dwellings-v2", "test", "graph_out");
+        const modelReal = path.join(ROOT, "outputs", "models", predDir, "real");
+        try { await access(path.join(modelReal, `${id}.pickle`)); realDir = modelReal; } catch { /* per-floor */ }
+        args.push("--overlay-real", realDir);
+      }
     } else if (kind === "truth") {
       // ground truth: prefer the model's OWN real reference (outline-only track,
       // e.g. centroid-v1 whose ids are apartment unit_ids, not test floors); else
@@ -53,6 +65,8 @@ export async function GET(req: NextRequest) {
     } else {
       args = ["--split", split, "--id", id, "--kind", kind, "--out", outPath, "--size", String(size)];
     }
+    if (crop) args.push("--crop");
+    if (rot) args.push("--rot", String(rot));
     try {
       await execFileP(PY, [SCRIPT, ...args], { cwd: ROOT, timeout: 30000, maxBuffer: 1 << 20 });
     } catch (e: unknown) {

@@ -45,10 +45,12 @@ export default function Counter({
     return () => io.disconnect();
   }, [to, duration]);
 
+  // Pin the locale so server and client format identically (avoids a hydration
+  // mismatch like "0.00" on the server vs "0,00" in a German browser).
   const text =
     decimals > 0
-      ? v.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
-      : Math.round(v).toLocaleString();
+      ? v.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+      : Math.round(v).toLocaleString("en-US");
 
   return (
     <span ref={ref}>

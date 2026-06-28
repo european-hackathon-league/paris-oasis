@@ -27,7 +27,7 @@ python - "$RUN_ID" "$MODEL_NAME" "$SIZE" "$EPOCHS" "$BATCH" "$NTRAIN" "$NTEST" <
 import sys, json, os, time
 rid, name, size, ep, batch, ntr, nte = sys.argv[1:8]
 d = f"outputs/models/{rid}"
-json.dump({"id": rid, "name": name, "family": "generative", "status": "running",
+json.dump({"id": rid, "name": name, "family": "generative", "engine": "unet", "status": "running",
            "config": {"size": int(size), "epochs": int(ep), "batch": int(batch),
                       "ntrain": int(ntr), "ntest": int(nte), "base": 24},
            "metrics": None, "createdAt": int(time.time() * 1000), "source": "web"},

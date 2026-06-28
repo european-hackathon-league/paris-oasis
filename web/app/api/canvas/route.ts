@@ -10,8 +10,22 @@ export const dynamic = "force-dynamic";
 const execFileP = promisify(execFile);
 const ROOT = path.resolve(process.cwd(), "..");
 const PY = path.join(ROOT, ".venv", "bin", "python");
-const SCRIPT = path.join(ROOT, "scripts", "canvas_predict.py");
+const CANVAS_SCRIPT = path.join(ROOT, "scripts", "canvas_predict.py");
+const CENTROID_SCRIPT = path.join(ROOT, "scripts", "centroid_predict.py");
 const CANVAS_DIR = path.join(ROOT, "outputs", "canvas");
+
+// Which inference engine runs a given store model from a bare sketch. Only models
+// that can generate from the structure ALONE are sketch-capable; the engine is
+// declared in the model's meta.json ("unet" | "centroid"). Default: U-Net.
+async function engineFor(modelId: string): Promise<string> {
+  if (!modelId) return "unet";
+  try {
+    const meta = JSON.parse(await readFile(path.join(ROOT, "outputs", "models", modelId, "meta.json"), "utf8"));
+    return meta.engine === "centroid" ? "centroid" : "unet";
+  } catch {
+    return "unet";
+  }
+}
 
 // POST { image: dataURL(png of drawn walls), rooms?: number, model?: id }
 //   -> { ok, doc, image: dataURL(generated plan) }
@@ -36,6 +50,9 @@ export async function POST(req: NextRequest) {
   const sketchPath = path.join(CANVAS_DIR, `sketch_${stamp}.png`);
   const planPath = path.join(CANVAS_DIR, `plan_${stamp}.png`);
   await writeFile(sketchPath, Buffer.from(m[1], "base64"));
+
+  const engine = await engineFor(modelId);
+  const SCRIPT = engine === "centroid" ? CENTROID_SCRIPT : CANVAS_SCRIPT;
 
   let doc: unknown;
   try {

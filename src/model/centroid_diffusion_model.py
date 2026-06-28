@@ -162,7 +162,8 @@ def train(args):
                       .reshape(B, -1) * va).sum() / (va.sum() + 1e-6)
             l_val = F.binary_cross_entropy_with_logits(pval, va)
             l_count = F.mse_loss(net.count(out_emb, vmask), va.sum(1))      # global room count from outline
-            loss = l_pos + 0.5 * l_type + 0.5 * l_val + 0.1 * l_count
+            cw = 0.0 if getattr(args, "legacy", False) else 0.1            # legacy v1 = no count head
+            loss = l_pos + 0.5 * l_type + 0.5 * l_val + cw * l_count
             opt.zero_grad(); loss.backward()
             torch.nn.utils.clip_grad_norm_(net.parameters(), 1.0)
             opt.step()
@@ -194,20 +195,23 @@ def sample(dev, verts, vmask, steps=100):
     ts = list(range(0, RES_T, max(1, RES_T // steps)))[::-1]
     v = torch.tensor(verts, device=dev)[None]; vm = torch.tensor(vmask, device=dev)[None]
     out_emb = net.encode(v, vm)
-    K = max(2, min(16, int(round(float(net.count(out_emb, vm).item())))))
+    legacy = os.environ.get("CENTROID_LEGACY") == "1"     # v1: per-node validity (no count head)
+    K = 16 if legacy else max(2, min(16, int(round(float(net.count(out_emb, vm).item())))))
     with torch.no_grad():
         x = torch.randn(1, K, 2, device=dev)
-        plog = None
+        plog = pval = None
         for i, ti in enumerate(ts):
             t = torch.full((1,), ti, device=dev)
             ab = abar[ti]
-            px0, plog, _ = net(x, t, out_emb, vm)
+            px0, plog, pval = net(x, t, out_emb, vm)
             px0 = px0.clamp(-0.7, 0.7)
             eps = (x - ab.sqrt() * px0) / (1 - ab).sqrt()
             tp = ts[i + 1] if i + 1 < len(ts) else None
             x = px0 if tp is None else abar[tp].sqrt() * px0 + (1 - abar[tp]).sqrt() * eps
     cents = x[0].cpu().numpy()
     types = plog[0].argmax(-1).cpu().numpy()
+    if legacy:
+        return cents, types, (torch.sigmoid(pval[0]) > 0.5).cpu().numpy()
     return cents, types, np.ones(K, dtype=bool)
 
 
@@ -217,12 +221,16 @@ def main():
     t = sub.add_parser("train")
     t.add_argument("--data", default="outputs/centroid_train.npz")
     t.add_argument("--epochs", type=int, default=600); t.add_argument("--batch", type=int, default=128)
+    t.add_argument("--legacy", action="store_true", help="v1: no count head (count loss off)")
     for name in ("generate", "real"):
         p = sub.add_parser(name)
         p.add_argument("--data", default="outputs/centroid_train.npz")
         p.add_argument("--out", default="outputs/models/centroid-v1/generated")
         p.add_argument("--n", type=int, default=None); p.add_argument("--steps", type=int, default=100)
+        p.add_argument("--legacy", action="store_true", help="v1: per-node validity (no count head)")
     a = ap.parse_args()
+    if getattr(a, "legacy", False):
+        os.environ["CENTROID_LEGACY"] = "1"
     if a.cmd == "train":
         train(a)
     else:

@@ -95,7 +95,7 @@ export default function LiveExplorer() {
             <>
               <span className="font-mono font-semibold text-slate-900">#{id ?? "—"}</span>
               <span className="mx-2 text-slate-300">|</span>
-              {total ? `${idx + 1} / ${total.toLocaleString()}` : "no samples"}
+              {total ? `${idx + 1} / ${total.toLocaleString("en-US")}` : "no samples"}
             </>
           )}
         </div>

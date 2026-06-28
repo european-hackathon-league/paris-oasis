@@ -55,12 +55,53 @@ def build_program_graph(room_types, areas=None) -> nx.Graph:
     return G
 
 
+def envelope_polygon(free, col_vals, row_vals):
+    """Largest closed contour of the drawn outline -> a world-frame Polygon."""
+    from skimage import measure
+    from shapely.geometry import Polygon
+    conts = measure.find_contours(free.astype(float), 0.5)
+    if not conts:
+        return None
+    cont = max(conts, key=len)
+    nc, nr = len(col_vals), len(row_vals)
+    pts = [(float(col_vals[min(int(round(c)), nc - 1)]), float(row_vals[min(int(round(r)), nr - 1)])) for r, c in cont]
+    poly = Polygon(pts)
+    if not poly.is_valid:
+        poly = poly.buffer(0)
+    if poly.is_empty:
+        return None
+    return max(poly.geoms, key=lambda g: g.area) if poly.geom_type == "MultiPolygon" else poly
+
+
+def partition_layout(G, free, col_vals, row_vals):
+    """Voronoi partition of the drawn envelope, one cell per program room."""
+    import networkx as nx
+    import torch
+    from partition import partition_envelope
+    env = envelope_polygon(free, col_vals, row_vals)
+    if env is None or env.is_empty or env.area <= 0:
+        raise ValueError("could not read the outline")
+    cells = partition_envelope(env, G)
+    out = nx.Graph(); out.graph.update(G.graph)
+    for n in G.nodes:
+        c = cells.get(n)
+        if c is None or c.is_empty or c.area <= 0:
+            continue
+        out.add_node(n, geometry=list(c.exterior.coords), room_type=int(G.nodes[n]["room_type"]),
+                     centroid=torch.tensor([c.centroid.x, c.centroid.y]))
+    for u, v, d in G.edges(data=True):
+        if u in out and v in out:
+            out.add_edge(u, v, connectivity=d.get("connectivity"))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--in", dest="inp", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--program", required=True, help="JSON: {rooms:[{type,count}], areas:{type:m2}}")
     ap.add_argument("--size", type=int, default=256)
+    ap.add_argument("--model", default="rect", choices=["rect", "partition"])
     a = ap.parse_args()
 
     prog = json.loads(a.program)
@@ -79,7 +120,8 @@ def main():
         print(json.dumps({"ok": False, "error": "draw a closed building outline first"})); return
 
     try:
-        out = R.layout(G, free, col_vals, row_vals, mapping=None, rules={})
+        out = partition_layout(G, free, col_vals, row_vals) if a.model == "partition" \
+            else R.layout(G, free, col_vals, row_vals, mapping=None, rules={})
     except Exception as e:
         print(json.dumps({"ok": False, "error": f"layout failed: {e}"})); return
 

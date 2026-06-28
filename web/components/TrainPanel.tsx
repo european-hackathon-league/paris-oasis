@@ -3,10 +3,26 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type Config = { size: number; epochs: number; batch: number; ntrain: number; ntest: number };
+type Foreign = {
+  source: "registry" | "process";
+  pid: number | null;
+  model: string;
+  config: Record<string, string | number>;
+  elapsedSec: number;
+  startedAt: number | null;
+  epochs: { epoch: number; total: number; loss: number }[];
+  curEpoch: number | null;
+  totalEpochs: number | null;
+  loss: number | null;
+  etaSec: number | null;
+  tail: string[];
+  liveLoss: boolean;
+};
 type Status = {
   running: boolean;
   gpuBusy: boolean;
   foreignRun: boolean;
+  foreign: Foreign | null;
   status: string;
   config: Config | null;
   startedAt: number | null;
@@ -15,6 +31,14 @@ type Status = {
   metrics: Record<string, number> | null;
   tail: string[];
 };
+
+function fmtDur(sec: number): string {
+  if (sec < 60) return `${sec}s`;
+  const m = Math.floor(sec / 60), s = sec % 60;
+  if (m < 60) return `${m}m ${s}s`;
+  const h = Math.floor(m / 60);
+  return `${h}h ${m % 60}m`;
+}
 
 const PRESETS: { name: string; sub: string; cfg: Config }[] = [
   { name: "Quick", sub: "~1 min · sanity", cfg: { size: 128, epochs: 10, batch: 32, ntrain: 500, ntest: 100 } },
@@ -88,6 +112,7 @@ export default function TrainPanel() {
 
   const running = st?.running;
   const foreign = st?.foreignRun;          // a training started outside this panel
+  const fr = st?.foreign ?? null;          // its details (params, loss, ETA)
   const locked = running || foreign;        // GPU is occupied -> no new run
   const last = st?.epochs?.[st.epochs.length - 1];
   const cur = last?.epoch ?? 0;
@@ -134,11 +159,56 @@ export default function TrainPanel() {
         ))}
       </div>
 
-      {/* GPU-busy guard banner (a run started outside this panel) */}
-      {foreign && (
-        <div className="mt-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
-          The GPU is busy with a training run started elsewhere. Starting is disabled until it finishes — one run at a time.
+      {/* Live view of a run started outside this panel (manual CLI, another Claude
+          instance, any model) — caught and shown with whatever telemetry exists. */}
+      {fr && (
+        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-2 text-sm font-semibold text-amber-900">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+              External run · <span className="font-mono">{fr.model}</span>
+            </span>
+            <span className="font-mono text-xs text-amber-700">
+              {fr.pid ? `pid ${fr.pid} · ` : ""}running {fmtDur(fr.elapsedSec)}
+              {fr.etaSec != null ? ` · ~${fmtDur(fr.etaSec)} left` : ""}
+            </span>
+          </div>
+
+          {/* parameters recovered from the run */}
+          {Object.keys(fr.config).length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {Object.entries(fr.config).map(([k, v]) => (
+                <span key={k} className="rounded-md border border-amber-200 bg-white/70 px-2 py-1 text-xs text-amber-900">
+                  <span className="text-amber-500">{k}</span> <span className="font-semibold">{String(v)}</span>
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* epoch progress + loss curve when the run persists progress */}
+          {fr.liveLoss ? (
+            <div className="mt-3">
+              <div className="mb-2 flex items-center justify-between text-sm">
+                <span className="font-medium text-amber-900">
+                  Epoch {fr.curEpoch ?? 0}{fr.totalEpochs ? ` / ${fr.totalEpochs}` : ""}
+                </span>
+                <span className="font-mono text-amber-700">{fr.loss != null ? `loss ${fr.loss.toFixed(4)}` : ""}</span>
+              </div>
+              {fr.totalEpochs && fr.curEpoch ? (
+                <div className="h-2 w-full overflow-hidden rounded-full bg-amber-200">
+                  <div className="h-full bg-amber-500 transition-all" style={{ width: `${Math.round((fr.curEpoch / fr.totalEpochs) * 100)}%` }} />
+                </div>
+              ) : null}
+              <div className="mt-3"><LossSpark epochs={fr.epochs} /></div>
+            </div>
+          ) : (
+            <p className="mt-3 text-xs text-amber-700">
+              Detected on the GPU, but this run wasn&apos;t started through the live panel or{" "}
+              <code className="rounded bg-amber-100 px-1">trainwatch.sh</code>, so it isn&apos;t streaming a loss
+              curve. Launch future runs via the wrapper to see loss + ETA here.
+            </p>
+          )}
+          <p className="mt-3 text-xs text-amber-700">Starting a new run is disabled until this finishes — one run at a time.</p>
         </div>
       )}
 
